@@ -23,24 +23,24 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore WallpaperManager/WallpaperManager.sln
+        run: dotnet restore WallpaperManager.sln
 
       - name: Build
-        run: dotnet build WallpaperManager/WallpaperManager.sln -c Release --no-restore
+        run: dotnet build WallpaperManager.sln -c Release --no-restore
 
       - name: Test
-        run: dotnet test WallpaperManager/WallpaperManager.sln -c Release --no-build --verbosity minimal
+        run: dotnet test WallpaperManager.sln -c Release --no-build --verbosity minimal
 
       - name: Publish Framework-Dependent
         run: |
-          dotnet publish WallpaperManager/WallpaperManager/WallpaperManager.csproj `
+          dotnet publish WallpaperManager.csproj `
             -c Release `
             -o ./publish/fdd `
             --self-contained false
 
       - name: Publish Self-Contained (win-x64)
         run: |
-          dotnet publish WallpaperManager/WallpaperManager/WallpaperManager.csproj `
+          dotnet publish WallpaperManager.csproj `
             -c Release `
             -r win-x64 `
             -o ./publish/win-x64 `
