@@ -1,0 +1,165 @@
+<Window x:Class="WallpaperManager.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:WallpaperManager.Models"
+        mc:Ignorable="d"
+        Title="Настройки"
+        Height="600"
+        Width="500"
+        MinHeight="500"
+        MinWidth="400"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- Таймер -->
+                <GroupBox Header="Таймер" Margin="0,0,0,16">
+                    <StackPanel Margin="8">
+                        <Label Content="Интервал смены (часы):"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Value="{Binding TimerIntervalHours}"
+                                    Minimum="1"
+                                    Maximum="24"
+                                    Width="300"
+                                    TickFrequency="1"
+                                    IsSnapToTickEnabled="True"
+                                    VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding TimerIntervalHours, StringFormat={}{0} ч.}"
+                                       VerticalAlignment="Center"
+                                       Margin="12,0,0,0"
+                                       Width="40"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Источник изображений -->
+                <GroupBox Header="Источник изображений" Margin="0,0,0,16">
+                    <StackPanel Margin="8">
+                        <Label Content="Тип источника:"/>
+                        <RadioButton Content="Онлайн (Unsplash)"
+                                     IsChecked="{Binding SelectedSource, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Online}"
+                                     Margin="0,4"/>
+                        <RadioButton Content="Локальные папки"
+                                     IsChecked="{Binding SelectedSource, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Local}"
+                                     Margin="0,4"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Онлайн настройки -->
+                <GroupBox Header="Онлайн источник (Unsplash)" Margin="0,0,0,16">
+                    <StackPanel Margin="8">
+                        <Label Content="API ключ Unsplash:"/>
+                        <TextBox Text="{Binding UnsplashAccessKey, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,8"/>
+
+                        <Button Content="Проверить доступность"
+                                Command="{Binding TestOnlineSourceCommand}"
+                                Style="{StaticResource SecondaryButton}"
+                                HorizontalAlignment="Left"
+                                Margin="0,0,0,8"/>
+
+                        <TextBlock Text="{Binding IsOnlineSourceAvailable, Converter={StaticResource BoolToVisibilityConverter}}"
+                                   Margin="0,4">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="Недоступен"/>
+                                    <Setter Property="Foreground" Value="Red"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsOnlineSourceAvailable}" Value="True">
+                                            <Setter Property="Text" Value="Доступен"/>
+                                            <Setter Property="Foreground" Value="Green"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <Label Content="Поисковый запрос:" Margin="0,12,0,0"/>
+                        <TextBox Text="{Binding OnlineQuery, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,8"/>
+
+                        <Label Content="Категория:"/>
+                        <ComboBox ItemsSource="{Binding Categories}"
+                                  SelectedItem="{Binding OnlineCategory}"
+                                  IsEditable="True"/>
+
+                        <Label Content="Количество предзагружаемых изображений:" Margin="0,12,0,0"/>
+                        <ComboBox ItemsSource="{Binding PreloadCounts}"
+                                  SelectedItem="{Binding OnlinePreloadCount}"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Локальные папки -->
+                <GroupBox Header="Локальные папки" Margin="0,0,0,16">
+                    <StackPanel Margin="8">
+                        <ListBox ItemsSource="{Binding LocalFolders}"
+                                 Height="100"
+                                 Margin="0,0,0,8">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                        <Button Grid.Column="1"
+                                                Content="X"
+                                                Command="{Binding DataContext.RemoveLocalFolderCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                Style="{StaticResource DangerButton}"
+                                                Padding="8,2"
+                                                FontSize="10"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <Button Content="Добавить папку"
+                                Command="{Binding AddLocalFolderCommand}"
+                                Style="{StaticResource SecondaryButton}"
+                                HorizontalAlignment="Left"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Системные настройки -->
+                <GroupBox Header="Системные настройки" Margin="0,0,0,16">
+                    <StackPanel Margin="8">
+                        <CheckBox Content="Запускать при старте Windows"
+                                  IsChecked="{Binding StartWithWindows}"/>
+
+                        <CheckBox Content="Сворачивать в системный трей"
+                                  IsChecked="{Binding MinimizeToTray}"/>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,16,0,0">
+            <Button Content="Отмена"
+                    Command="{Binding CancelCommand}"
+                    Style="{StaticResource SecondaryButton}"
+                    Width="100"
+                    Margin="0,0,8,0"/>
+
+            <Button Content="Сохранить"
+                    Command="{Binding SaveSettingsCommand}"
+                    Style="{StaticResource PrimaryButton}"
+                    Width="100"/>
+        </StackPanel>
+    </Grid>
+</Window>
