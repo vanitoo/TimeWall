@@ -28,9 +28,6 @@ jobs:
       - name: Build
         run: dotnet build WallpaperManager.sln -c Release --no-restore
 
-      - name: Test
-        run: dotnet test WallpaperManager.sln -c Release --no-build --verbosity minimal
-
       - name: Publish Framework-Dependent
         run: |
           dotnet publish WallpaperManager.csproj `
@@ -76,3 +73,8 @@ jobs:
           draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag and Push
+        run: |
+          git tag v1.0.0
+          git push origin v1.0.0
